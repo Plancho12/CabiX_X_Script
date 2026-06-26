@@ -1,22 +1,15 @@
--- CabiX_X Script con Bordes RGB, Minimizado y Enlace a YouTube
+    -- CabiX_X Script con Sistema de Carga Segura y Bordes RGB
+repeat task.wait() until game:IsLoaded()
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+repeat task.wait() until LP and LP.Character
+
 local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-local ScrollContainer = Instance.new("ScrollingFrame")
-local UIListLayout = Instance.new("UIListLayout")
-
--- Botones de Control de Ventana
-local CloseBtn = Instance.new("TextButton")
-local MinimizeBtn = Instance.new("TextButton")
-local MinimizeBall = Instance.new("TextButton")
-
--- Botón de YouTube
-local YTButton = Instance.new("ImageButton")
-
--- Configuración de la GUI Principal
-ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "CabiX_X_Gui"
+ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
+local MainFrame = Instance.new("Frame")
 MainFrame.Name = "CabiX_X_Main"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -25,11 +18,11 @@ MainFrame.Size = UDim2.new(0, 230, 0, 350)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Bordes redondeados para la ventana principal
 local MainCorner = Instance.new("UICorner", MainFrame)
 MainCorner.CornerRadius = UDim.new(0, 10)
 
--- Título Centralizado: "CabiX_X Script"
+-- Título Centralizado
+local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundTransparency = 1
@@ -40,6 +33,7 @@ Title.Font = Enum.Font.SourceSansBold
 Title.TextAlignment = Enum.TextAlignment.Center
 
 -- Botón Cerrar (X)
+local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = MainFrame
 CloseBtn.Size = UDim2.new(0, 25, 0, 25)
 CloseBtn.Position = UDim2.new(1, -30, 0, 5)
@@ -51,6 +45,7 @@ CloseBtn.TextSize = 14
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 5)
 
 -- Botón Minimizar (-)
+local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = MainFrame
 MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
 MinimizeBtn.Position = UDim2.new(1, -60, 0, 5)
@@ -61,7 +56,8 @@ MinimizeBtn.Font = Enum.Font.SourceSansBold
 MinimizeBtn.TextSize = 14
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 5)
 
--- Bola Flotante de Minimizado (X-X)
+-- Bola Flotante (X-X)
+local MinimizeBall = Instance.new("TextButton")
 MinimizeBall.Name = "CabiX_X_Ball"
 MinimizeBall.Parent = ScreenGui
 MinimizeBall.Size = UDim2.new(0, 50, 0, 50)
@@ -74,36 +70,37 @@ MinimizeBall.TextSize = 16
 MinimizeBall.Visible = false
 MinimizeBall.Active = true
 MinimizeBall.Draggable = true
-local BallCorner = Instance.new("UICorner", MinimizeBall)
-BallCorner.CornerRadius = UDim.new(1, 0) -- Lo hace una bola perfecta
+Instance.new("UICorner", MinimizeBall).CornerRadius = UDim.new(1, 0)
 
--- Botón de YouTube con Logo Oficial
+-- Botón de YouTube
+local YTButton = Instance.new("ImageButton")
 YTButton.Parent = MainFrame
 YTButton.Size = UDim2.new(0, 25, 0, 25)
 YTButton.Position = UDim2.new(0, 8, 0, 5)
 YTButton.BackgroundTransparency = 1
-YTButton.Image = "rbxassetid://13404533033" -- Icono limpio de YouTube en Roblox
+YTButton.Image = "rbxassetid://13404533033"
 
--- Contenedor Deslizable (ScrollingFrame)
+-- Contenedor Deslizable
+local ScrollContainer = Instance.new("ScrollingFrame")
 ScrollContainer.Parent = MainFrame
 ScrollContainer.Position = UDim2.new(0, 0, 0, 45)
 ScrollContainer.Size = UDim2.new(1, 0, 1, -45)
 ScrollContainer.BackgroundTransparency = 1
-ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 640)
+ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 500)
 ScrollContainer.ScrollBarThickness = 4
 ScrollContainer.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
 
+local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ScrollContainer
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 8)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Configuración de Colores e Iluminación RGB
-local ColorActivo = Color3.fromRGB(0, 255, 200) -- Celeste neón
+-- Configuración de Efecto RGB
+local ColorActivo = Color3.fromRGB(0, 255, 200)
 local ColorInactivo = Color3.fromRGB(40, 40, 40)
 local RGBObjects = {}
 
--- Añadir bordes de línea para el efecto RGB cromático
 local function ApplyRGBStroke(object)
     local stroke = Instance.new("UIStroke")
     stroke.Thickness = 2
@@ -115,20 +112,19 @@ end
 ApplyRGBStroke(MainFrame)
 ApplyRGBStroke(MinimizeBall)
 
--- Hilo de animación para el ciclo RGB cromático
 task.spawn(function()
     while true do
         for i = 0, 1, 0.005 do
             local color = Color3.fromHSV(i, 1, 1)
             for _, stroke in pairs(RGBObjects) do
-                stroke.Color = color
+                if stroke and stroke.Parent then stroke.Color = color end
             end
             task.wait(0.02)
         end
     end
 end)
 
--- Sistema para crear Toggles Estilizados con bordes RGB
+-- Sistema de Toggles
 local function CreateToggle(text, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = ScrollContainer
@@ -145,43 +141,35 @@ local function CreateToggle(text, callback)
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.BackgroundColor3 = state and ColorActivo or ColorInactivo
-        if state then btn.TextColor3 = Color3.fromRGB(0, 0, 0) else btn.TextColor3 = Color3.fromRGB(255, 255, 255) end
+        btn.TextColor3 = state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
         callback(state)
     end)
     return btn
 end
 
--- Función para estilizar Cajas de Texto
 local function StyleTextBox(box)
     ApplyRGBStroke(box)
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 end
 
--- --- ACCIONES DE VENTANA ---
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
+-- Acciones de Ventana
+CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     MinimizeBall.Position = MainFrame.Position
     MinimizeBall.Visible = true
 end)
-
 MinimizeBall.MouseButton1Click:Connect(function()
     MinimizeBall.Visible = false
     MainFrame.Position = MinimizeBall.Position
     MainFrame.Visible = true
 end)
-
 YTButton.MouseButton1Click:Connect(function()
-    -- Comando nativo que abre el navegador en ejecutores móviles modernos
     if setclipboard then setclipboard("https://youtube.com/@cabixx_xgaming?si=YoRsYbqICYcevzb2") end
     game:GetService("GuiService"):OpenBrowserWindow("https://youtube.com/@cabixx_xgaming?si=YoRsYbqICYcevzb2")
 end)
 
--- --- CARACTERÍSTICAS Y COMANDOS DEL PANEL ---
-local LP = game.Players.LocalPlayer
+-- Variables de funciones
 local InfJump = false
 local Noclip = false
 local Fling = false
@@ -189,7 +177,7 @@ local Flying = false
 
 local function GetPlayer(name)
     name = name:lower()
-    for _, p in pairs(game.Players:GetPlayers()) do
+    for _, p in pairs(Players:GetPlayers()) do
         if p.Name:lower():sub(1, #name) == name or (p.DisplayName and p.DisplayName:lower():sub(1, #name) == name) then
             return p
         end
@@ -207,13 +195,10 @@ SpeedBox.Text = ""
 SpeedBox.Font = Enum.Font.SourceSans
 SpeedBox.TextSize = 14
 StyleTextBox(SpeedBox)
-
 SpeedBox.FocusLost:Connect(function()
     local num = tonumber(SpeedBox.Text)
-    if num and num >= 1 and num <= 1000000 then
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-            LP.Character.Humanoid.WalkSpeed = num
-        end
+    if num and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+        LP.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = num
     end
 end)
 
@@ -227,17 +212,14 @@ JumpBox.Text = ""
 JumpBox.Font = Enum.Font.SourceSans
 JumpBox.TextSize = 14
 StyleTextBox(JumpBox)
-
 JumpBox.FocusLost:Connect(function()
     local num = tonumber(JumpBox.Text)
-    if num then
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-            LP.Character.Humanoid.JumpPower = num
-        end
+    if num and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+        LP.Character:FindFirstChildOfClass("Humanoid").JumpPower = num
     end
 end)
 
--- 3. FLY TOGGLE
+-- 3. FLY
 CreateToggle("Fly (Volar)", function(state)
     Flying = state
     local char = LP.Character
@@ -290,7 +272,7 @@ CreateToggle("Invisible", function(state)
     end
 end)
 
--- 7. FORCEFIELD (FF)
+-- 7. FORCEFIELD
 local currentFF = nil
 CreateToggle("ForceField (Escudo FF)", function(state)
     if state then
@@ -326,7 +308,6 @@ FreezeBox.Text = ""
 FreezeBox.Font = Enum.Font.SourceSansBold
 FreezeBox.TextSize = 14
 StyleTextBox(FreezeBox)
-
 FreezeBox.FocusLost:Connect(function()
     local target = GetPlayer(FreezeBox.Text)
     if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
@@ -347,14 +328,12 @@ JailBox.Text = ""
 JailBox.Font = Enum.Font.SourceSansBold
 JailBox.TextSize = 14
 StyleTextBox(JailBox)
-
 JailBox.FocusLost:Connect(function()
     local target = GetPlayer(JailBox.Text)
     if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
         local cf = target.Character.HumanoidRootPart.CFrame
         local jailModel = Instance.new("Model", workspace)
         jailModel.Name = "CabiXJail_" .. target.Name
-        
         local function makeWall(pos, size)
             local wall = Instance.new("Part", jailModel)
             wall.Size = size
@@ -363,14 +342,12 @@ JailBox.FocusLost:Connect(function()
             wall.Material = Enum.Material.ForceField
             wall.Transparency = 0.5
         end
-        
         makeWall(CFrame.new(0, -3.5, 0), Vector3.new(10, 1, 10))
         makeWall(CFrame.new(0, 4.5, 0), Vector3.new(10, 1, 10))
         makeWall(CFrame.new(5, 0, 0), Vector3.new(1, 8, 10))
         makeWall(CFrame.new(-5, 0, 0), Vector3.new(1, 8, 10))
         makeWall(CFrame.new(0, 0, 5), Vector3.new(10, 8, 1))
         makeWall(CFrame.new(0, 0, -5), Vector3.new(10, 8, 1))
-        
         JailBox.Text = "¡Encarcelado!"
         task.wait(1)
         JailBox.Text = ""
